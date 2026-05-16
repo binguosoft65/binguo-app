@@ -21,6 +21,7 @@ paid micro-tool / 小程序 starts from this scaffold (复利沉淀: reuse, don'
 | Build / dev | Vite                  | Instant dev server, fast builds, static output, zero config    |
 | Hosting     | GitHub Pages          | $0, no card, no extra account — cheapest viable for static     |
 | CI/CD       | GitHub Actions        | Native to the repo, free for public repos                      |
+| Tests       | Vitest                | Vite-native, zero-config; red-line suite is a CI merge gate    |
 | Monitoring  | Console reporter stub | Minimal viable; upgrade path = Sentry free tier (see TOOLS.md) |
 
 No backend yet by design. Tools that need server-side compute will add
@@ -31,16 +32,24 @@ Cloudflare Workers (free tier) per product — decided at product time, not now.
 ```bash
 npm install      # one-time
 npm run dev       # http://localhost:5173
+npm run test      # watch-mode unit tests (Vitest)
+npm run test:run  # one-shot run (used by CI)
 npm run build     # typecheck + production build → dist/
 npm run preview   # serve the production build locally
 ```
 
 Requires Node 22+.
 
+The reusable generation core lives in [`src/core/`](./src/core) — LLM
+provider abstraction (mock + real adapter, key never in repo), structured
+钩子-痛点-价值-CTA prompt + platform/goal/style template registry, and the
+red-line gatekeeper. Downstream products import only from `src/core`.
+
 ## Conventions
 
 Branch & commit conventions live in [CONTRIBUTING.md](./CONTRIBUTING.md).
-CI (`.github/workflows/ci.yml`) blocks any PR that fails typecheck or build.
+CI (`.github/workflows/ci.yml`) blocks any PR that fails typecheck, the
+red-line test suite (CEO 上线门 ④), or build.
 Push to `main` auto-deploys via `.github/workflows/deploy.yml`.
 
 ## Ownership & license

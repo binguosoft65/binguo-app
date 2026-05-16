@@ -1,6 +1,8 @@
 name: CI
 
-# Gate every pull request: typecheck + production build must pass before merge.
+# Gate every pull request: typecheck + red-line tests + production build
+# must pass before merge. The test step is the CEO 上线门 ④ gate — the
+# red-line suite (src/core/redline.test.ts ①②③) must stay green.
 
 on:
   pull_request:
@@ -18,4 +20,5 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run typecheck
+      - run: npm run test:run
       - run: npm run build
