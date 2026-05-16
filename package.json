@@ -8,7 +8,8 @@
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "tsc --noEmit && npm run typecheck:worker",
+    "typecheck:worker": "tsc -p worker --noEmit",
     "test": "vitest",
     "test:run": "vitest run"
   },

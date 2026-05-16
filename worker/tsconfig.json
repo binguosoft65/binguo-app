@@ -1,0 +1,23 @@
+{
+  // Standalone typecheck for the Cloudflare Worker proxy (CMP-9 / T2).
+  // Kept separate from the root (Vite) tsconfig: the Worker is a separate
+  // deployable, not part of the Pages bundle. DOM lib supplies the
+  // structurally-compatible Request/Response/Headers/URL/fetch types, so
+  // we stay dependency-free ($0, no @cloudflare/workers-types install).
+  // Wired into CI via the root `typecheck` script.
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "skipLibCheck": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "types": []
+  },
+  "include": ["index.ts", "index.test.ts", "../src/core"]
+}

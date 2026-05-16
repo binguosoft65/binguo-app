@@ -1,0 +1,22 @@
+# 缤果文案台 LLM 代理 —— Cloudflare Worker 配置 (CMP-9 / T2)
+#
+# ⚠️ 本文件**绝不含任何密钥**。LLM_API_KEY 仅经
+#     `wrangler secret put LLM_API_KEY`
+# 在部署环境注入 (= Worker secret,服务端持有)。接真 key + 公开上线
+# 是 CMP-5 §6 board approval gate 之后的集成步,不在本仓库提交。
+#
+# 仓库内保持 keyless:无 secret 时 Worker 确定性降级到 mock provider,
+# 可对 mock 端到端跑通 + 真供应商 adapter 同时就绪。
+
+name = "binguo-llm-proxy"
+main = "index.ts"
+compatibility_date = "2025-01-01"
+
+# 非密钥配置。LLM_BASE_URL / LLM_MODEL 待 §6 选定供应商后由部署者设置
+# (或经 `wrangler secret put` 一并注入);此处留空 → 仓库 keyless。
+[vars]
+ALLOWED_ORIGINS = "https://binguosoft65.github.io,http://localhost:5173,http://127.0.0.1:5173"
+
+# Workers Free 计划:无需付费即可部署 ($0 免费额度,CMP-2 预留升级路径)。
+[observability]
+enabled = true
