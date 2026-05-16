@@ -1,0 +1,17 @@
+{
+  "name": "binguo-app",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "缤果软件 (Bingo Software) 公司应用基座 — company app foundation & product starter",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.3",
+    "vite": "^5.4.10"
+  }
+}

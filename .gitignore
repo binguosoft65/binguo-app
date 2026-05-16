@@ -1,0 +1,15 @@
+node_modules/
+dist/
+*.log
+npm-debug.log*
+.DS_Store
+.env
+.env.*
+!.env.example
+.vite/
+.idea/
+.vscode/
+
+# Cross-issue workspace artifact owned by CMP-4 (KPI dashboard), not part of
+# this code repo. Lives here only as a shared-workspace convenience copy.
+KPI_DASHBOARD.md
