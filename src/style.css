@@ -200,3 +200,93 @@ button.danger {
   font-size: 0.8rem;
   color: var(--muted);
 }
+
+/* —— 计次 + paywall 闸位 (CMP-10 / T4) —— 功能可用即可 —— */
+.quota-badge {
+  margin: 0 0 1.25rem;
+  display: inline-block;
+  font-size: 0.82rem;
+  color: var(--muted);
+  background: var(--bg-soft);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 0.2rem 0.7rem;
+}
+.locked-feature {
+  border: 1px dashed #f0c9c6;
+  color: var(--brand);
+  background: #fff5f4;
+}
+.locked-hint {
+  margin: 0.75rem 0 0.3rem;
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+.paywall-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: rgba(26, 26, 26, 0.5);
+}
+.paywall-dialog {
+  position: relative;
+  width: min(30rem, 100%);
+  max-height: 90vh;
+  overflow: auto;
+  background: #fff;
+  border-radius: var(--radius);
+  padding: 1.5rem 1.4rem;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.18);
+}
+.paywall-close {
+  position: absolute;
+  top: 0.6rem;
+  right: 0.6rem;
+}
+.paywall-heading {
+  margin: 0 1.5rem 0.5rem 0;
+  font-size: 1.2rem;
+}
+.paywall-lead {
+  margin: 0 0 0.9rem;
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+.paywall-benefits-title {
+  margin: 0 0 0.4rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+.paywall-benefits {
+  margin: 0 0 1.1rem;
+  padding-left: 1.1rem;
+  display: grid;
+  gap: 0.35rem;
+  font-size: 0.88rem;
+}
+.paywall-benefit-desc {
+  color: var(--muted);
+}
+.paywall-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+.paywall-placeholder-note {
+  margin: 0.9rem 0 0;
+  padding: 0.6rem 0.8rem;
+  border-radius: 8px;
+  background: var(--bg-soft);
+  border: 1px solid var(--line);
+  font-size: 0.84rem;
+  color: var(--muted);
+}
+.paywall-footnote {
+  margin: 0.9rem 0 0;
+  font-size: 0.76rem;
+  color: var(--muted);
+}

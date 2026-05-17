@@ -43,3 +43,18 @@ export type {
   GenerationResult,
   GenerationBody,
 } from './generate'
+
+// —— 计费层闸位 + 每日计次 (CMP-10 / T4, 复利可复用 Q3) ——
+export {
+  FREE_DAILY_LIMIT,
+  FREE_BODY_PREVIEW_CHARS,
+  LOCKED_CAPABILITY_IDS,
+  LOCKED_CAPABILITIES,
+  isCapabilityLocked,
+  unlockedCapabilities,
+  clampBodyForTier,
+} from './entitlements'
+export type { Tier, LockedCapability, Capability } from './entitlements'
+
+export { peekQuota, consumeQuota, resetQuota } from './quota'
+export type { QuotaState, QuotaScope } from './quota'

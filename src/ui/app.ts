@@ -2,11 +2,14 @@
 // 并渲染全站固定免责页脚 (红线③,任何状态下恒在 DOM)。
 //
 // Done 判据 (CMP-8): 本地 mock 下可跑通「输入 → 结果」闭环。
-import type { Generator, GenerationResult } from '../core'
+import type { Generator, GenerationResult, LockedCapability } from '../core'
 import { RedLineError, GenerationError } from '../core'
 import { RED_LINE_DISCLAIMER } from '../core'
+import { peekQuota, consumeQuota } from '../core'
 import { buildForm } from './form'
 import { renderResultPanel } from './result'
+import { renderPaywall } from './paywall'
+import type { PaywallReason } from './paywall'
 import type { Tier } from './watermark'
 import {
   loadHistory,
@@ -44,6 +47,21 @@ export function mountApp(root: HTMLElement, opts: MountOptions): () => void {
   const shell = el('main', 'binguo-app')
 
   const header = el('header', 'app-header')
+
+  // —— 计次徽标 (CMP-10 / T4): 免费层每日剩余次数, 实时反映闸位状态 ——
+  const quotaBadge = el('p', 'quota-badge')
+  quotaBadge.dataset.testid = 'quota-badge'
+  function renderQuotaBadge(): void {
+    if (tier === 'paid') {
+      quotaBadge.textContent = '已解锁 · 无限次生成'
+      return
+    }
+    const q = peekQuota()
+    quotaBadge.textContent = q.exhausted
+      ? `免费版 · 今日 ${q.limit} 次已用完,升级解锁无限次`
+      : `免费版 · 今日剩余 ${q.remaining}/${q.limit} 次`
+  }
+
   header.append(
     el('h1', 'app-title', '缤果文案台'),
     el(
@@ -51,9 +69,31 @@ export function mountApp(root: HTMLElement, opts: MountOptions): () => void {
       'app-tagline',
       '自填卖点 + 选题 → 原创爆款标题与结构化正文 · 不洗稿 · 不搬运',
     ),
+    quotaBadge,
   )
 
-  const { form, read, fill } = buildForm()
+  // —— Paywall 闸位占位管理 (单实例; 真实支付=下游 CMP-6, 本轨不收银) ——
+  let paywallEl: HTMLElement | null = null
+  function closePaywall(): void {
+    paywallEl?.remove()
+    paywallEl = null
+  }
+  function openPaywall(
+    reason: PaywallReason,
+    capability?: LockedCapability,
+  ): void {
+    closePaywall()
+    paywallEl = renderPaywall({ reason, capability, onClose: closePaywall })
+    shell.append(paywallEl)
+  }
+
+  const { form, read, fill } = buildForm({
+    // 锁定层闸位: 风格/行业模板库 = 付费能力, 触发即占位。
+    onLockedTemplates:
+      tier === 'free'
+        ? () => openPaywall('locked_capability', 'template_library')
+        : undefined,
+  })
 
   const resultRegion = el('div', 'result-region')
   resultRegion.dataset.testid = 'result-region'
@@ -96,6 +136,15 @@ export function mountApp(root: HTMLElement, opts: MountOptions): () => void {
           showResult(result, recordId, rec?.favorite ?? !favorite)
           renderHistory()
         },
+        // 锁定层闸位 (CMP-10 / T4): 免费层只给闸位入口, 不交付能力。
+        ...(tier === 'free'
+          ? {
+              onUnlockLongBody: () =>
+                openPaywall('locked_capability', 'long_body'),
+              onUnlockWatermarkFree: () =>
+                openPaywall('locked_capability', 'watermark_free_export'),
+            }
+          : {}),
       }),
     )
   }
@@ -172,6 +221,11 @@ export function mountApp(root: HTMLElement, opts: MountOptions): () => void {
   form.addEventListener('submit', (ev) => {
     ev.preventDefault()
     if (busy) return
+    // 闸位 (CMP-10 / T4 Done): 免费额度耗尽 → 触发 paywall, 不再生成。
+    if (tier === 'free' && peekQuota().exhausted) {
+      openPaywall('quota_exhausted')
+      return
+    }
     busy = true
     errorBox.hidden = true
     errorBox.textContent = ''
@@ -193,6 +247,9 @@ export function mountApp(root: HTMLElement, opts: MountOptions): () => void {
         const rec = list[0]
         showResult(result, rec.id, rec.favorite)
         renderHistory()
+        // 生成成功才计次 (红线错误/失败不扣额度)。
+        if (tier === 'free') consumeQuota()
+        renderQuotaBadge()
       })
       .catch((err: unknown) => {
         const msg =
@@ -224,6 +281,7 @@ export function mountApp(root: HTMLElement, opts: MountOptions): () => void {
   )
   root.append(shell)
 
+  renderQuotaBadge()
   renderHistory()
 
   return () => root.replaceChildren()

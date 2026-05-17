@@ -10,8 +10,12 @@
 import { renderResult, RED_LINE_DISCLAIMER } from '../core'
 import type { GenerationResult } from '../core'
 
-/** 计费层。免费层带署名水印;付费层 (T4) 去署名。 */
-export type Tier = 'free' | 'paid'
+/**
+ * 计费层。免费层带署名水印;付费层 (T4) 去署名。
+ * 单一事实来源在 core/entitlements;此处仅再导出,历史 import 路径不变。
+ */
+import type { Tier } from '../core'
+export type { Tier }
 
 /**
  * 免费层署名水印文案。轻量、单行、可被用户连同正文一起复制分发,

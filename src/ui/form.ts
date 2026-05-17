@@ -21,6 +21,15 @@ export interface InputFormHandle {
   fill(values: Record<string, string>): void
 }
 
+export interface BuildFormOptions {
+  /**
+   * 锁定层闸位 (CMP-10 / T4): 「风格 / 行业模板库」是付费能力。
+   * 提供回调即在表单内渲染闸位入口 (触发即弹 paywall 占位)。
+   * 不提供则不渲染 (免费层基础风格仍可正常选择)。
+   */
+  onLockedTemplates?: () => void
+}
+
 function field(labelText: string, control: HTMLElement): HTMLElement {
   const wrap = document.createElement('div')
   wrap.className = 'field'
@@ -52,7 +61,7 @@ function select(
  * 构造输入表单。返回表单元素与读/填句柄。表单本身不触发生成,
  * 由 app.ts 监听 submit 后经 core 编排 (mock provider) 生成。
  */
-export function buildForm(): InputFormHandle {
+export function buildForm(opts: BuildFormOptions = {}): InputFormHandle {
   const form = document.createElement('form')
   form.className = 'input-form'
   form.setAttribute('novalidate', '')
@@ -104,9 +113,21 @@ export function buildForm(): InputFormHandle {
     field('发布平台', platform),
     field('内容目标', goal),
     field('语气风格', style),
-    notice,
-    submit,
   )
+
+  // 锁定层闸位 (CMP-10 / T4): 风格/行业模板库 = 付费能力。
+  // 这是一个 <button>(非命名输入控件),不进入红线① 表单白名单扫描。
+  if (opts.onLockedTemplates) {
+    const lockedTpl = document.createElement('button')
+    lockedTpl.type = 'button'
+    lockedTpl.className = 'locked-feature ghost'
+    lockedTpl.dataset.testid = 'locked-templates-btn'
+    lockedTpl.textContent = '🔒 解锁更多风格 / 行业模板库'
+    lockedTpl.addEventListener('click', () => opts.onLockedTemplates?.())
+    form.append(lockedTpl)
+  }
+
+  form.append(notice, submit)
 
   const read = (): Record<string, string> => ({
     sellingPoints: sellingPoints.value,
